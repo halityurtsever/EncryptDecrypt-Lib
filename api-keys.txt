@@ -1,0 +1,3 @@
+﻿TextEncryptDecrypt v2.0.0
+API Key: oy2fg2nr4csur2o6qfcab353dpv5m5vevbdb6cmegvi72e
+
