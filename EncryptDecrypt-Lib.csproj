@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CB8AF82F-DB15-420B-B53A-52E106C6347D}</ProjectGuid>
+    <ProjectGuid>{C48DD3FD-DA20-475F-AE8F-DA1C30D20451}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TextEncryptDecrypt</RootNamespace>

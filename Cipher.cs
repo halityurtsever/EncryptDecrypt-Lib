@@ -38,6 +38,12 @@ namespace TextEncryptDecrypt
         //################################################################################
         #region Public Members
 
+        /// <summary>
+        /// Encrypts the given text by using the given password
+        /// </summary>
+        /// <param name="plainText">Text to be encrypted</param>
+        /// <param name="password">Encryption password</param>
+        /// <returns>Encrypted text in Base64 string format</returns>
         public string Encrypt(string plainText, string password)
         {
             var plainTextBuffer = Encoding.UTF8.GetBytes(plainText);
@@ -47,6 +53,12 @@ namespace TextEncryptDecrypt
             return Convert.ToBase64String(textEncryptBuffer.CombineBuffer());
         }
 
+        /// <summary>
+        /// Decrypts the given text by using the given password
+        /// </summary>
+        /// <param name="encryptedText">Text to be decrypted</param>
+        /// <param name="password">Decryption password</param>
+        /// <returns>Decrypted text in string format</returns>
         public string Decrypt(string encryptedText, string password)
         {
             var encryptedCombinedBuffer = Convert.FromBase64String(encryptedText);
@@ -61,11 +73,24 @@ namespace TextEncryptDecrypt
             return Encoding.UTF8.GetString(decryptedBuffer, 0, decryptedBuffer.Length);
         }
 
+        /// <summary>
+        /// Encrypt the file in the given path. Encrypted file is created
+        /// in the same folder of the original file with the extension ".encrypt".
+        /// </summary>
+        /// <param name="sourceFilePath">Path of the file will be encrypted</param>
+        /// <param name="password">Encryption password</param>
+        /// <returns>File path of the encrypted file</returns>
         public string EncryptFile(string sourceFilePath, string password)
         {
             return EncryptDecryptFile(sourceFilePath, password, true);
         }
 
+        /// <summary>
+        /// Decrypt the file in the given path.
+        /// </summary>
+        /// <param name="sourceFilePath">Path of the file will be decrypted</param>
+        /// <param name="password">Decryption password</param>
+        /// <returns>File path of the decrypted file</returns>
         public string DecryptFile(string sourceFilePath, string password)
         {
             return EncryptDecryptFile(sourceFilePath, password, false);
