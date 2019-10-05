@@ -87,6 +87,20 @@ namespace TextEncryptDecrypt
         }
 
         /// <summary>
+        /// Encrypt the file in the given path. Encrypted file is created
+        /// in the same folder of the original file with the extension ".encrypt".
+        /// </summary>
+        /// <param name="sourceFilePath">Path of the file will be encrypted</param>
+        /// <param name="targetFilePath">Path of the target file</param>
+        /// <param name="password">Encryption password</param>
+        /// <param name="deleteOriginalFile">Set true if original file must be deleted</param>
+        /// <returns>File path of the encrypted file</returns>
+        public string EncryptFile(string sourceFilePath, string targetFilePath, string password, bool deleteOriginalFile = false)
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Decrypt the file in the given path.
         /// </summary>
         /// <param name="sourceFilePath">Path of the file will be decrypted</param>
@@ -96,6 +110,19 @@ namespace TextEncryptDecrypt
         public string DecryptFile(string sourceFilePath, string password, bool deleteEncryptedFile = false)
         {
             return EncryptDecryptFile(sourceFilePath, password, false);
+        }
+
+        /// <summary>
+        /// Decrypt the file in the given path.
+        /// </summary>
+        /// <param name="sourceFilePath">Path of the file will be decrypted</param>
+        /// <param name="targetFilePath">Path of the target file</param>
+        /// <param name="password">Decryption password</param>
+        /// <param name="deleteOriginalFile">Set true if encrypted file must be deleted</param>
+        /// <returns>File path of the decrypted file</returns>
+        public string DecryptFile(string sourceFilePath, string targetFilePath, string password, bool deleteOriginalFile = false)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion
