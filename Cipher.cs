@@ -79,8 +79,9 @@ namespace TextEncryptDecrypt
         /// </summary>
         /// <param name="sourceFilePath">Path of the file will be encrypted</param>
         /// <param name="password">Encryption password</param>
+        /// <param name="deleteOriginalFile">Set true if original file must be deleted</param>
         /// <returns>File path of the encrypted file</returns>
-        public string EncryptFile(string sourceFilePath, string password)
+        public string EncryptFile(string sourceFilePath, string password, bool deleteOriginalFile = false)
         {
             return EncryptDecryptFile(sourceFilePath, password, true);
         }
@@ -90,8 +91,9 @@ namespace TextEncryptDecrypt
         /// </summary>
         /// <param name="sourceFilePath">Path of the file will be decrypted</param>
         /// <param name="password">Decryption password</param>
+        /// <param name="deleteEncryptedFile">Set true if encrypted file must be deleted</param>
         /// <returns>File path of the decrypted file</returns>
-        public string DecryptFile(string sourceFilePath, string password)
+        public string DecryptFile(string sourceFilePath, string password, bool deleteEncryptedFile = false)
         {
             return EncryptDecryptFile(sourceFilePath, password, false);
         }
