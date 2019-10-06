@@ -34,23 +34,60 @@ namespace TextEncryptDecrypt
             return fileBuffer;
         }
 
-        internal static string WriteFile(byte[] byteBuffer, string sourceFilePath, string extension, bool isEncrypt)
+        internal static void WriteFile(byte[] byteBuffer, string targetFile)
         {
-            var targetFilePath = CreateTargetFile(sourceFilePath, extension, isEncrypt);
-
-            using (var fileStream = new FileStream(targetFilePath, FileMode.Open, FileAccess.Write))
+            using (var fileStream = new FileStream(targetFile, FileMode.Open, FileAccess.Write))
             {
                 fileStream.Write(byteBuffer, 0, byteBuffer.Length);
                 fileStream.Close();
+            }
+        }
+
+        internal static string CreateTargetFile(string fileFolder, string fileName, string fileExtension, bool isEncrypt)
+        {
+            var targetFilePath = isEncrypt ? $"{fileFolder}\\{fileName}.encrypt" :
+                                             $"{fileFolder}\\{fileName}-decrypted{fileExtension}";
+
+            if (!File.Exists(targetFilePath))
+            {
+                using (var fileStream = File.Create(targetFilePath))
+                {
+                    fileStream.Close();
+                }
             }
 
             return targetFilePath;
         }
 
-        internal static void CheckFileAndSize(string filePath)
+        internal static void CheckFile(string filePath)
         {
-            CheckFile(filePath);
+            CheckFileExistence(filePath);
+            CheckFileSize(filePath);
+        }
 
+        internal static void CheckFolder(string folderPath)
+        {
+            if (!Directory.Exists(folderPath))
+            {
+                throw new ArgumentException($"Invalid folder path: {folderPath}");
+            }
+        }
+
+        #endregion
+
+        //################################################################################
+        #region Private Static Members
+
+        private static void CheckFileExistence(string filePath)
+        {
+            if (!File.Exists(filePath))
+            {
+                throw new ArgumentException($"Path: {filePath} doesn't exists.");
+            }
+        }
+
+        private static void CheckFileSize(string filePath)
+        {
             var isFileTooBig = false;
             using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
             {
@@ -66,38 +103,6 @@ namespace TextEncryptDecrypt
             {
                 throw new ArgumentException("File size cannot be large than 5 MB.");
             }
-        }
-
-        internal static void CheckFile(string filePath)
-        {
-            if (!File.Exists(filePath))
-            {
-                throw new ArgumentException($"Path: {filePath} doesn't exists.");
-            }
-        }
-
-        #endregion
-
-        //################################################################################
-        #region Private Static Members
-
-        private static string CreateTargetFile(string sourceFilePath, string extension, bool isEncrypt)
-        {
-            var sourceFileDirectory = Path.GetDirectoryName(sourceFilePath);
-            var sourceFileName = Path.GetFileNameWithoutExtension(sourceFilePath);
-
-            var targetFilePath = isEncrypt ? $"{sourceFileDirectory}\\{sourceFileName}.encrypt" :
-                                             $"{sourceFileDirectory}\\{sourceFileName}-decrypted{extension}";
-
-            if (!File.Exists(targetFilePath))
-            {
-                using (var fileStream = File.Create(targetFilePath))
-                {
-                    fileStream.Close();
-                }
-            }
-
-            return targetFilePath;
         }
 
         #endregion

@@ -83,7 +83,7 @@ namespace TextEncryptDecrypt
         /// <returns>File path of the encrypted file</returns>
         public string EncryptFile(string sourceFilePath, string password, bool deleteOriginalFile = false)
         {
-            return EncryptDecryptFile(sourceFilePath, password, true);
+            return EncryptDecryptFile(sourceFilePath, null, password, true, deleteOriginalFile);
         }
 
         /// <summary>
@@ -97,7 +97,7 @@ namespace TextEncryptDecrypt
         /// <returns>File path of the encrypted file</returns>
         public string EncryptFile(string sourceFilePath, string targetFilePath, string password, bool deleteOriginalFile = false)
         {
-            throw new NotImplementedException();
+            return EncryptDecryptFile(sourceFilePath, targetFilePath, password, true, deleteOriginalFile);
         }
 
         /// <summary>
@@ -109,7 +109,7 @@ namespace TextEncryptDecrypt
         /// <returns>File path of the decrypted file</returns>
         public string DecryptFile(string sourceFilePath, string password, bool deleteEncryptedFile = false)
         {
-            return EncryptDecryptFile(sourceFilePath, password, false);
+            return EncryptDecryptFile(sourceFilePath, null, password, false, deleteEncryptedFile);
         }
 
         /// <summary>
@@ -118,11 +118,11 @@ namespace TextEncryptDecrypt
         /// <param name="sourceFilePath">Path of the file will be decrypted</param>
         /// <param name="targetFilePath">Path of the target file</param>
         /// <param name="password">Decryption password</param>
-        /// <param name="deleteOriginalFile">Set true if encrypted file must be deleted</param>
+        /// <param name="deleteEncryptedFile">Set true if encrypted file must be deleted</param>
         /// <returns>File path of the decrypted file</returns>
-        public string DecryptFile(string sourceFilePath, string targetFilePath, string password, bool deleteOriginalFile = false)
+        public string DecryptFile(string sourceFilePath, string targetFilePath, string password, bool deleteEncryptedFile = false)
         {
-            throw new NotImplementedException();
+            return EncryptDecryptFile(sourceFilePath, targetFilePath, password, false, deleteEncryptedFile);
         }
 
         #endregion
@@ -130,18 +130,22 @@ namespace TextEncryptDecrypt
         //################################################################################
         #region Private Members
 
-        private string EncryptDecryptFile(string sourceFilePath, string password, bool isEncrypt)
+        private string EncryptDecryptFile(string sourceFilePath, string targetFilePath, string password, bool isEncrypt, bool deleteOriginal)
         {
-            FileHelper.CheckFileAndSize(sourceFilePath);
+            FileHelper.CheckFile(sourceFilePath);
+            if (targetFilePath != null) FileHelper.CheckFolder(targetFilePath);
+
+            var fileFolder = targetFilePath ?? Path.GetDirectoryName(sourceFilePath);
+            var fileName = Path.GetFileNameWithoutExtension(sourceFilePath);
+            var fileExtension = Path.GetExtension(sourceFilePath);
 
             var fileBuffer = FileHelper.ReadFile(sourceFilePath);
-            var extension = Path.GetExtension(sourceFilePath);
             byte[] writeBuffer;
 
             if (isEncrypt)
             {
-                var encryptedBuffer = EncryptDecryptText(fileBuffer, password, isEncrypt);
-                var fileEncryptBuffer = new FileEncryptBuffer(extension, password, InitBuffer, SaltBuffer, encryptedBuffer);
+                var encryptedBuffer = EncryptDecryptText(fileBuffer, password, isEncrypt: true);
+                var fileEncryptBuffer = new FileEncryptBuffer(fileExtension, password, InitBuffer, SaltBuffer, encryptedBuffer);
                 writeBuffer = fileEncryptBuffer.CombineBuffer();
             }
             else
@@ -149,19 +153,27 @@ namespace TextEncryptDecrypt
                 var fileDecryptBuffer = new FileDecryptBuffer(fileBuffer);
                 var parsedEncryptedBuffer = fileDecryptBuffer.ParseBuffer();
 
+                //set InitBuffer and SaltBuffer from the parsed decrypt buffer
                 InitBuffer = fileDecryptBuffer.DecryptedInitBuffer;
                 SaltBuffer = fileDecryptBuffer.DecryptedSaltBuffer;
 
-                writeBuffer = EncryptDecryptText(parsedEncryptedBuffer, password, isEncrypt);
-                extension = fileDecryptBuffer.DecryptedExtension;
+                writeBuffer = EncryptDecryptText(parsedEncryptedBuffer, password, isEncrypt: false);
+                fileExtension = fileDecryptBuffer.DecryptedExtension;
             }
 
-            return FileHelper.WriteFile(writeBuffer, sourceFilePath, extension, isEncrypt);
+            var targetFile = FileHelper.CreateTargetFile(fileFolder, fileName, fileExtension, isEncrypt);
+            FileHelper.WriteFile(writeBuffer, targetFile);
+
+            if (deleteOriginal)
+            {
+                File.Delete(sourceFilePath);
+            }
+
+            return targetFile;
         }
 
         private byte[] EncryptDecryptText(byte[] textBuffer, string password, bool isEncrypt)
         {
-
             var passwordBuffer = GetPasswordBytes(password);
 
             using (var rijndael = new RijndaelManaged())
